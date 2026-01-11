@@ -48,9 +48,10 @@ fun createToolSpecifications(): Array<McpServerFeatures.SyncToolSpecification> {
 
     val bioSensorToolSpecification = McpServerFeatures.SyncToolSpecification.builder()
         .tool(bioSensorTool)
-        .callHandler { _, _ ->
+        .callHandler { _, callToolRequest ->
+            val days = callToolRequest.arguments["days"].toString().toInt()
             McpSchema.CallToolResult.builder()
-                .addTextContent("Пульс пользователя 60")
+                .addTextContent("Пульс пользователя за $days дней был ${if (days > 30) 33 else 66} ударов в минуту")
                 .isError(false)
                 .build()
         }
@@ -59,9 +60,17 @@ fun createToolSpecifications(): Array<McpServerFeatures.SyncToolSpecification> {
     return arrayOf(bioSensorToolSpecification)
 }
 
-fun createBioSensorSchema(): String = ObjectMapper().createObjectNode()
-    .put("type", "object")
-    .toString()
+fun createBioSensorSchema(): String {
+    val root = ObjectMapper().createObjectNode()
+        .put("type", "object")
+    root.putObject("properties")
+        .putObject("days")
+        .put("type", "integer")
+        .put("description", "Number of past days to include in the pulse reading request")
+    root.putArray("required")
+        .add("days")
+    return root.toString()
+}
 
 fun createServerCapabilities(): McpSchema.ServerCapabilities = McpSchema.ServerCapabilities.builder()
     .tools(true)

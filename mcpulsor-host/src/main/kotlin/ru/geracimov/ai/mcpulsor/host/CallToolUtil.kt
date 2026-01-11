@@ -1,5 +1,6 @@
 package ru.geracimov.ai.mcpulsor.host
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.modelcontextprotocol.spec.McpSchema
 import java.util.regex.Pattern
@@ -18,9 +19,18 @@ object CallToolUtil {
     fun getRequiredTool(callToolRequest: String): McpSchema.CallToolRequest {
         val matcher = TOOL_CALL_PATTERN.matcher(callToolRequest)
         matcher.find()
-        val callToolRequestJson = matcher.group(1).trim()
-        val toolName = mapper.readTree(callToolRequestJson).get("name").asText()
-        return McpSchema.CallToolRequest.builder().name(toolName).build()
+        val callToolRequestString = matcher.group(1).trim()
+        val callToolRequestJsonNode = mapper.readTree(callToolRequestString)
+        val toolName = callToolRequestJsonNode.get("name").asText()
+        val parametersJsonNode = callToolRequestJsonNode.path("parameters")
+        val args: Map<String, Any> = mapper.convertValue(
+            parametersJsonNode,
+            object : TypeReference<Map<String, Any>>() {}
+        )
+        return McpSchema.CallToolRequest.builder()
+            .name(toolName)
+            .arguments(args)
+            .build()
     }
 
     fun wrapResponse(response: String) = String.format(
