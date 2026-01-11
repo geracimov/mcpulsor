@@ -43,24 +43,52 @@ fun createToolSpecifications(): Array<McpServerFeatures.SyncToolSpecification> {
         .name("bioSensor")
         .title("Human Vital Pulse Sensor")
         .description("Returns the current heart rate of the user as a simple string value")
-        .inputSchema(JacksonMcpJsonMapper(ObjectMapper()), createBioSensorSchema())
+        .inputSchema(JacksonMcpJsonMapper(ObjectMapper()), createBioSensorInputSchema())
+        .outputSchema(JacksonMcpJsonMapper(ObjectMapper()), createBioSensorOutputSchema())
         .build()
 
     val bioSensorToolSpecification = McpServerFeatures.SyncToolSpecification.builder()
         .tool(bioSensorTool)
         .callHandler { _, callToolRequest ->
             val days = callToolRequest.arguments["days"].toString().toInt()
-            McpSchema.CallToolResult.builder()
-                .addTextContent("Пульс пользователя за $days дней был ${if (days > 30) 33 else 66} ударов в минуту")
-                .isError(false)
-                .build()
+            calculateResult(days)
         }
         .build()
 
     return arrayOf(bioSensorToolSpecification)
 }
 
-fun createBioSensorSchema(): String {
+private fun calculateResult(days: Int): McpSchema.CallToolResult? {
+    val properties = mapOf<String, Any>(
+        "pulse" to "Пульс пользователя за $days дней был ${if (days > 30) 66 else 33} ударов в минуту",
+        "state" to "Тебе кабзда",
+        "sleepDeprivation" to true,
+    )
+
+    return McpSchema.CallToolResult.builder()
+        .structuredContent(properties)
+        .isError(false)
+        .build()
+}
+
+fun createBioSensorOutputSchema(): String {
+    val rootJsonNode = ObjectMapper().createObjectNode()
+        .put("type", "object")
+    val propertiesJsonNode = rootJsonNode.putObject("properties")
+    propertiesJsonNode.putObject("pulse")
+        .put("type", "string")
+        .put("description", "The current pulse rate of the user for last days")
+        .put("minLength", "1")
+    propertiesJsonNode.putObject("state")
+        .put("type", "string")
+        .put("description", "The current state of the user")
+    propertiesJsonNode.putObject("sleepDeprivation")
+        .put("type", "boolean")
+        .put("description", "Whether the user is sleep deprived or not")
+    return rootJsonNode.toString()
+}
+
+fun createBioSensorInputSchema(): String {
     val root = ObjectMapper().createObjectNode()
         .put("type", "object")
     root.putObject("properties")
