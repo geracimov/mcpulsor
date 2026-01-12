@@ -9,9 +9,12 @@ COPY . /src
 # Build fat jar via shade plugin
 RUN --mount=type=cache,target=/root/.m2 \
     set -eux; \
-    mvn -q -DskipTests -f "${MODULE_DIR}/pom.xml" package; \
+    mvn -DskipTests -f "${MODULE_DIR}/pom.xml" package; \
     mkdir -p /app; \
-    cp "${MODULE_DIR}"/target/*-fat.jar /app/app.jar
+    ls -la "${MODULE_DIR}/target"; \
+    JAR="$(ls -1 ${MODULE_DIR}/target/*.jar | grep -v 'original' | head -n 1)"; \
+    echo "Using jar: $JAR"; \
+    cp "$JAR" /app/app.jar
 
 # ---------- Runtime: STDIO + Inspector (one container) ----------
 FROM eclipse-temurin:24-jre-alpine AS stdio

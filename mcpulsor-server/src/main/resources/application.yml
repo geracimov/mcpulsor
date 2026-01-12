@@ -1,0 +1,8 @@
+spring.ai.mcp.server:
+  annotation-scanner.enabled: true
+  name: mcpulsor
+  protocol: streamable
+  type: sync
+  version: 1.6.6.6
+  streamable-http.mcp-endpoint: /mcpulsor
+server.port: 8091

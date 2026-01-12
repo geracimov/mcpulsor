@@ -48,7 +48,7 @@ object SystemPromptFactory {
 
     private fun formatTool(tool: McpSchema.Tool): String = with(StringJoiner("\n").add("- name: ${tool.name}")) {
         with(tool) {
-            if (title.isNotEmpty()) add("  title: $title")
+            if (title!=null) add("  title: $title")
             if (description.isNotEmpty()) add("  description: $description")
             if (inputSchema.toString().isNotEmpty()) add("  inputSchema: $inputSchema")
             if (outputSchema != null && outputSchema.isNotEmpty()) add("  outputSchema: $outputSchema")

@@ -17,8 +17,8 @@ fun main(args: Array<String>) {
         host.printAnswerToUser(it)
     }*/
 
-    host.printAnswerToUser("Я Лена, скажи, чем я болен?")
-    host.printAnswerToUser("Я Вася, скажи, чем я болен?")
+//    host.printAnswerToUser("Я Лена, скажи, чем я болен?")
+//    host.printAnswerToUser("Я Вася, скажи, чем я болен?")
     host.printAnswerToUser("Я Коля, скажи, чем я болен?")
 
 }
