@@ -19,8 +19,8 @@ fun main() {
 
         callTool(
             McpSchema.CallToolRequest.builder()
-                .name("bioSensor")
-                .arguments(mapOf("days" to 666))
+                .name("diagnostator")
+                .arguments(mapOf("name" to "Коля"))
                 .build()
         ).content.forEach { println("Результат: $it") }
     }
