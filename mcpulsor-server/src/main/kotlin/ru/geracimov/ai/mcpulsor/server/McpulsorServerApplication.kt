@@ -49,7 +49,13 @@ fun createToolSpecifications(): Array<McpServerFeatures.SyncToolSpecification> {
 
     val bioSensorToolSpecification = McpServerFeatures.SyncToolSpecification.builder()
         .tool(bioSensorTool)
-        .callHandler { _, callToolRequest ->
+        .callHandler { mcpSyncServerExchange, callToolRequest ->
+            mcpSyncServerExchange.loggingNotification(
+                McpSchema.LoggingMessageNotification.builder()
+                    .data("Сервер говорит: получил запрос на вызов тула: $callToolRequest")
+                    .level(McpSchema.LoggingLevel.EMERGENCY)
+                    .build()
+            )
             val days = callToolRequest.arguments["days"].toString().toInt()
             calculateResult(days)
         }

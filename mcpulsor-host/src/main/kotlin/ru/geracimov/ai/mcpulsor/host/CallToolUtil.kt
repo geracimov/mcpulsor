@@ -22,6 +22,7 @@ object CallToolUtil {
         val callToolRequestString = matcher.group(1).trim()
         val callToolRequestJsonNode = mapper.readTree(callToolRequestString)
         val toolName = callToolRequestJsonNode.get("name").asText()
+
         val parametersJsonNode = callToolRequestJsonNode.path("parameters")
         val args: Map<String, Any> = mapper.convertValue(
             parametersJsonNode,

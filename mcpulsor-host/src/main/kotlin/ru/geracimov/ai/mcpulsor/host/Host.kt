@@ -20,7 +20,11 @@ class Host(private val chatClient: ChatClient) {
         val transport = HttpClientStreamableHttpTransport.builder("http://localhost:8091")
             .endpoint("/mcpulsor")
             .build()
-        client = McpClient.sync(transport).build()
+        client = McpClient.sync(transport)
+            .loggingConsumer {
+                println("Клиент: сообщение от сервера ${it.level} ${it.data}")
+            }
+            .build()
 
         with(client) {
             initialize()
